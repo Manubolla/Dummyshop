@@ -6,7 +6,6 @@ import {
   ProductModel,
 } from "@/src/data/mappers/product.mappers";
 import { useDebounce } from "@/src/hooks/useDebounce";
-import { useProductStore } from "@/src/store/useProductStore";
 import { useCartStore } from "@/src/store/useCartStore";
 import colors from "@/src/theme/colors";
 import { useRouter } from "expo-router";
@@ -17,7 +16,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { selectedCategory } = useProductStore();
   const insets = useSafeAreaInsets();
   const { items } = useCartStore();
 
@@ -99,6 +97,41 @@ export default function HomeScreen() {
     setSearchQuery(text);
   };
 
+  const onDismissModal = () => setModalVisible(false);
+  const onOpenModal = () => setModalVisible(true);
+  const onDismissMenu = () => setMenuVisible(false);
+  const onOpenMenu = () => setMenuVisible(true);
+
+  const renderItem = ({ item }: { item: ProductModel }) => {
+    const onPressProductItem = () =>
+      router.push({
+        pathname: "/[productId]",
+        params: { productId: String(item.id) },
+      });
+
+    return <ProductCard product={item} onPress={onPressProductItem} />;
+  };
+
+  const onApplyFilters = (filters: {
+    category?: string;
+    priceRange?: [number, number];
+  }) => setActiveFilters(filters);
+
+  const handleSortByName = () => {
+    setSort("name");
+    setMenuVisible(false);
+  };
+
+  const handleSortByPrice = () => {
+    setSort("price");
+    setMenuVisible(false);
+  };
+
+  const handleSortByRating = () => {
+    setSort("rating");
+    setMenuVisible(false);
+  };
+
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -109,31 +142,12 @@ export default function HomeScreen() {
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingTop: insets.top,
-        backgroundColor: colors.background,
-        alignItems: "center",
-      }}
-    >
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <View style={{ position: "relative" }}>
-          <IconButton
-            icon="filter-variant"
-            size={24}
-            onPress={() => setModalVisible(true)}
-          />
+        <View style={styles.activeFilterContainer}>
+          <IconButton icon="filter-variant" size={24} onPress={onOpenModal} />
           {activeFilterCount > 0 && (
-            <Badge
-              size={16}
-              style={{
-                position: "absolute",
-                top: 4,
-                right: 4,
-                backgroundColor: colors.primary,
-              }}
-            >
+            <Badge size={16} style={styles.filterBadge}>
               {activeFilterCount}
             </Badge>
           )}
@@ -144,58 +158,39 @@ export default function HomeScreen() {
           onChangeText={handleSearch}
           value={searchQuery}
           style={styles.searchbar}
-          inputStyle={{ fontSize: 14, marginTop: -2 }}
+          inputStyle={styles.input}
           iconColor={colors.muted}
           placeholderTextColor={colors.muted}
         />
 
         <Menu
           visible={menuVisible}
-          onDismiss={() => setMenuVisible(false)}
-          anchor={
-            <IconButton icon="sort" onPress={() => setMenuVisible(true)} />
-          }
+          onDismiss={onDismissMenu}
+          anchor={<IconButton icon="sort" onPress={onOpenMenu} />}
           anchorPosition="bottom"
-          contentStyle={{ backgroundColor: colors.surface }}
+          contentStyle={styles.menuContent}
         >
           <Menu.Item
-            onPress={() => {
-              setSort("name");
-              setMenuVisible(false);
-            }}
+            onPress={handleSortByName}
             title="Sort by Name"
             leadingIcon="sort-alphabetical-ascending"
           />
           <Menu.Item
-            onPress={() => {
-              setSort("price");
-              setMenuVisible(false);
-            }}
+            onPress={handleSortByPrice}
             title="Sort by Price"
             leadingIcon="sort-numeric-ascending"
           />
           <Menu.Item
-            onPress={() => {
-              setSort("rating");
-              setMenuVisible(false);
-            }}
+            onPress={handleSortByRating}
             title="Sort by Rating"
             leadingIcon="star"
           />
         </Menu>
 
-        <View style={{ position: "relative" }}>
+        <View style={styles.cartContainer}>
           <IconButton icon="cart" onPress={() => router.push("/cart")} />
           {totalQuantity > 0 && (
-            <Badge
-              style={{
-                position: "absolute",
-                top: 4,
-                right: 4,
-                backgroundColor: colors.primary,
-              }}
-              size={16}
-            >
+            <Badge style={styles.badge} size={16}>
               {totalQuantity}
             </Badge>
           )}
@@ -207,35 +202,19 @@ export default function HomeScreen() {
         numColumns={1}
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={() => (
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <View style={styles.emptyContainer}>
             <Text>No products found</Text>
           </View>
         )}
-        renderItem={({ item }) => (
-          <ProductCard
-            product={item}
-            onPress={() =>
-              router.push({
-                pathname: "/[productId]",
-                params: { productId: String(item.id) },
-              })
-            }
-          />
-        )}
+        renderItem={renderItem}
         contentContainerStyle={styles.grid}
         showsVerticalScrollIndicator={false}
       />
 
       <FilterModal
         visible={modalVisible}
-        onDismiss={() => setModalVisible(false)}
-        onApply={(filters) => setActiveFilters(filters)}
+        onDismiss={onDismissModal}
+        onApply={onApplyFilters}
         categories={categories}
       />
     </View>
@@ -243,6 +222,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+    alignItems: "center",
+  },
+  activeFilterContainer: { position: "relative" },
   centered: {
     flex: 1,
     justifyContent: "center",
@@ -271,5 +256,25 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 0,
     paddingBottom: 80,
+  },
+  input: { fontSize: 14, marginTop: -2 },
+  badge: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    backgroundColor: colors.primary,
+  },
+  filterBadge: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    backgroundColor: colors.primary,
+  },
+  menuContent: { backgroundColor: colors.surface },
+  cartContainer: { position: "relative" },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

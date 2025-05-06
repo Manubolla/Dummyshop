@@ -3,19 +3,18 @@ import {
   mapProductFromApi,
   ProductModel,
 } from "@/src/data/mappers/product.mappers";
+import { useCartStore } from "@/src/store/useCartStore";
+import { useProductStore } from "@/src/store/useProductStore";
 import colors from "@/src/theme/colors";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
 import { ActivityIndicator, IconButton, Text } from "react-native-paper";
-import { useProductStore } from "@/src/store/useProductStore";
-import { useCartStore } from "@/src/store/useCartStore";
 
 export default function ProductDetailScreen() {
   const { productId } = useLocalSearchParams<{ productId: string }>();
   const { addItem, getQuantity, removeItem } = useCartStore();
 
-  const router = useRouter();
   const { isFavorite, toggleFavorite } = useProductStore();
 
   const [product, setProduct] = useState<ProductModel | null>(null);
@@ -91,9 +90,7 @@ export default function ProductDetailScreen() {
 
             <View>
               <Text style={styles.price}>{product.price}</Text>
-              <Text style={styles.stock}>
-                Stock disponible: {product.stock}
-              </Text>
+              <Text style={styles.stock}>Stock: {product.stock}</Text>
             </View>
           </View>
         </View>

@@ -1,11 +1,11 @@
-import React from "react";
-import { View, StyleSheet, Alert, FlatList, Pressable } from "react-native";
-import { Text, Button, IconButton } from "react-native-paper";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
-import { useCartStore } from "@/src/store/useCartStore";
 import ProductCard from "@/src/components/ProductCard";
+import { useCartStore } from "@/src/store/useCartStore";
 import colors from "@/src/theme/colors";
+import { useRouter } from "expo-router";
+import React from "react";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
+import { Button, IconButton, Text } from "react-native-paper";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function CartScreen() {
   const { items, clearCart, addItem, removeItem } = useCartStore();
@@ -65,13 +65,11 @@ export default function CartScreen() {
           />
         )}
         ListEmptyComponent={
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
+          <View style={styles.cartEmpty}>
             <Text>Your cart is empty.</Text>
           </View>
         }
-        contentContainerStyle={{ paddingBottom: 120, flexGrow: 1 }}
+        contentContainerStyle={styles.listContainer}
       />
 
       <View style={styles.footer}>
@@ -139,4 +137,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flex: 1,
   },
+  cartEmpty: { flex: 1, alignItems: "center", justifyContent: "center" },
+  listContainer: { paddingBottom: 120, flexGrow: 1 },
 });

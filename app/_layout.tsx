@@ -1,16 +1,15 @@
+import colors from "@/src/theme/colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { StyleSheet } from "react-native";
 import "react-native-gesture-handler";
-import "react-native-reanimated";
-
-import colors from "@/src/theme/colors";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PaperProvider } from "react-native-paper";
+import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
 export { ErrorBoundary } from "expo-router";
 
 export const unstable_settings = {
@@ -44,9 +43,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <GestureHandlerRootView
-      style={{ flex: 1, backgroundColor: colors.background }}
-    >
+    <GestureHandlerRootView style={styles.container}>
       <PaperProvider>
         <SafeAreaProvider>
           <Stack>
@@ -62,3 +59,7 @@ function RootLayoutNav() {
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+});
