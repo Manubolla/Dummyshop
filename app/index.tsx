@@ -14,6 +14,14 @@ import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
 import { Badge, IconButton, Menu, Searchbar, Text } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+type SortOption =
+  | "price-asc"
+  | "price-desc"
+  | "name-asc"
+  | "name-desc"
+  | "rating-asc"
+  | "rating-desc";
+
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -26,7 +34,7 @@ export default function HomeScreen() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedQuery = useDebounce(searchQuery, 300);
-  const [sort, setSort] = useState<"price" | "name" | "rating">("price");
+  const [sort, setSort] = useState<SortOption>("name-asc");
   const [menuVisible, setMenuVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [activeFilters, setActiveFilters] = useState<{
@@ -37,6 +45,7 @@ export default function HomeScreen() {
   const [products, setProducts] = useState<ProductModel[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+
   const activeFilterCount =
     (activeFilters.category ? 1 : 0) +
     (activeFilters.priceRange &&
@@ -80,23 +89,46 @@ export default function HomeScreen() {
           : true
       )
       .sort((a, b) => {
-        if (sort === "price") {
-          return (
-            parseFloat(a.price.replace("$", "")) -
-            parseFloat(b.price.replace("$", ""))
-          );
+        const [field, direction] = sort.split("-");
+
+        if (field === "price") {
+          const aPrice = parseFloat(a.price.replace("$", ""));
+          const bPrice = parseFloat(b.price.replace("$", ""));
+          return direction === "asc" ? aPrice - bPrice : bPrice - aPrice;
         }
-        if (sort === "rating") {
-          return b.rating - a.rating;
+
+        if (field === "rating") {
+          return direction === "asc"
+            ? a.rating - b.rating
+            : b.rating - a.rating;
         }
-        return a.title.localeCompare(b.title);
+
+        if (field === "name") {
+          return direction === "asc"
+            ? a.title.localeCompare(b.title)
+            : b.title.localeCompare(a.title);
+        }
+
+        return 0;
       });
   }, [products, activeFilters, debouncedQuery, sort]);
 
-  const handleSearch = (text: string) => {
-    setSearchQuery(text);
+  const toggleSort = (field: "price" | "name" | "rating") => {
+    setSort((prev) => {
+      const defaultDirection =
+        field === "price" ? "asc" : field === "rating" ? "desc" : "asc";
+
+      const isCurrent = prev.startsWith(field);
+      const isAsc = prev === `${field}-asc`;
+
+      if (!isCurrent) return `${field}-${defaultDirection}` as SortOption;
+      return `${field}-${isAsc ? "desc" : "asc"}` as SortOption;
+    });
+
+    setMenuVisible(false);
   };
 
+  const handleSearch = (text: string) => setSearchQuery(text);
   const onDismissModal = () => setModalVisible(false);
   const onOpenModal = () => setModalVisible(true);
   const onDismissMenu = () => setMenuVisible(false);
@@ -116,21 +148,6 @@ export default function HomeScreen() {
     category?: string;
     priceRange?: [number, number];
   }) => setActiveFilters(filters);
-
-  const handleSortByName = () => {
-    setSort("name");
-    setMenuVisible(false);
-  };
-
-  const handleSortByPrice = () => {
-    setSort("price");
-    setMenuVisible(false);
-  };
-
-  const handleSortByRating = () => {
-    setSort("rating");
-    setMenuVisible(false);
-  };
 
   if (loading) {
     return (
@@ -171,18 +188,32 @@ export default function HomeScreen() {
           contentStyle={styles.menuContent}
         >
           <Menu.Item
-            onPress={handleSortByName}
-            title="Sort by Name"
+            onPress={() => toggleSort("name")}
+            title={`Sort by Name (${
+              sort === "name-asc" ? "A-Z" : sort === "name-desc" ? "Z-A" : "A-Z"
+            })`}
             leadingIcon="sort-alphabetical-ascending"
           />
           <Menu.Item
-            onPress={handleSortByPrice}
-            title="Sort by Price"
+            onPress={() => toggleSort("price")}
+            title={`Sort by Price (${
+              sort === "price-asc"
+                ? "Low-High"
+                : sort === "price-desc"
+                ? "High-Low"
+                : "Low-High"
+            })`}
             leadingIcon="sort-numeric-ascending"
           />
           <Menu.Item
-            onPress={handleSortByRating}
-            title="Sort by Rating"
+            onPress={() => toggleSort("rating")}
+            title={`Sort by Rating (${
+              sort === "rating-asc"
+                ? "Low-High"
+                : sort === "rating-desc"
+                ? "High-Low"
+                : "High-Low"
+            })`}
             leadingIcon="star"
           />
         </Menu>

@@ -76,6 +76,7 @@ export default function CartScreen() {
         <Text style={styles.total}>Total: ${total.toFixed(2)}</Text>
         <View style={styles.buttons}>
           <Button
+            disabled={!cartItems.length}
             mode="outlined"
             onPress={clearCart}
             style={styles.button}
@@ -83,7 +84,12 @@ export default function CartScreen() {
           >
             Clear Cart
           </Button>
-          <Button mode="contained" onPress={handleBuy} style={styles.button}>
+          <Button
+            disabled={!cartItems.length}
+            mode="contained"
+            onPress={handleBuy}
+            style={styles.button}
+          >
             Buy Now
           </Button>
         </View>

@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   },
   favorite: {
     position: "absolute",
-    top: 4,
+    top: 0,
     right: 4,
     borderRadius: 6,
   },
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   countOnly: {
     fontSize: 14,
     fontWeight: "bold",
-    backgroundColor: colors.primary,
+    backgroundColor: colors.black,
     color: colors.white,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -209,8 +209,8 @@ const styles = StyleSheet.create({
   },
   rating: {
     position: "absolute",
-    bottom: 8,
-    left: 12,
+    top: 8,
+    left: 4,
     fontSize: 12,
     backgroundColor: "#fff",
     borderRadius: 6,
