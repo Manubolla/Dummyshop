@@ -1,4 +1,5 @@
 import ProductCard from "@/src/components/ProductCard";
+import { sendLocalNotification } from "@/src/hooks/useNotifications";
 import { useCartStore } from "@/src/store/useCartStore";
 import colors from "@/src/theme/colors";
 import { useRouter } from "expo-router";
@@ -9,6 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function CartScreen() {
   const { items, clearCart, addItem, removeItem } = useCartStore();
+
   const cartItems = Object.values(items);
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -41,6 +43,11 @@ export default function CartScreen() {
   const handleBuy = () => {
     Alert.alert("Success", "Thank you for your purchase!");
     clearCart();
+    sendLocalNotification(
+      "Your order is being prepared",
+      "Thanks for shopping with us!",
+      5
+    );
   };
 
   return (

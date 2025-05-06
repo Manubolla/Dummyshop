@@ -1,3 +1,4 @@
+import { useNotifications } from "@/src/hooks/useNotifications";
 import colors from "@/src/theme/colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
@@ -23,6 +24,7 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
+  useNotifications();
 
   useEffect(() => {
     if (error) throw error;
