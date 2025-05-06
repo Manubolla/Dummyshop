@@ -6,20 +6,34 @@ import {
 import { useCartStore } from "@/src/store/useCartStore";
 import { useProductStore } from "@/src/store/useProductStore";
 import colors from "@/src/theme/colors";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
-import { ActivityIndicator, IconButton, Text } from "react-native-paper";
+import {
+  ActivityIndicator,
+  IconButton,
+  Text,
+  Button,
+  Snackbar,
+} from "react-native-paper";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 export default function ProductDetailScreen() {
   const { productId } = useLocalSearchParams<{ productId: string }>();
-  const { addItem, getQuantity, removeItem } = useCartStore();
-
+  const { addItem, getQuantity } = useCartStore();
   const { isFavorite, toggleFavorite } = useProductStore();
+  const router = useRouter();
 
   const [product, setProduct] = useState<ProductModel | null>(null);
   const [loading, setLoading] = useState(true);
-  const quantity = getQuantity(product?.id as number);
+  const [localQuantity, setLocalQuantity] = useState(1);
+  const [showSnackbar, setShowSnackbar] = useState(false);
+
+  const inCartQuantity = getQuantity(Number(productId));
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (!productId) return;
@@ -39,29 +53,43 @@ export default function ProductDetailScreen() {
   }, [productId]);
 
   const increment = () => {
-    if (product && quantity < product.stock) {
-      addItem(product);
+    if (product && localQuantity < product.stock) {
+      setLocalQuantity(localQuantity + 1);
     }
   };
 
   const decrement = () => {
-    if (quantity > 0) {
-      removeItem(product?.id as number);
+    if (localQuantity > 1) {
+      setLocalQuantity(localQuantity - 1);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (product) {
+      for (let i = 0; i < localQuantity; i++) {
+        addItem(product);
+      }
+      setShowSnackbar(true);
+      setTimeout(() => {
+        router.back();
+      }, 750);
     }
   };
 
   if (loading || !product) {
     return (
-      <View style={styles.centered}>
+      <SafeAreaView style={styles.centered}>
         <ActivityIndicator />
         <Text>Loading product...</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.page}>
-      <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.page} edges={["top", "left", "right"]}>
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingBottom: 200 }]}
+      >
         <View style={styles.imageWrapper}>
           <Image source={{ uri: product.thumbnail }} style={styles.image} />
           <IconButton
@@ -75,6 +103,14 @@ export default function ProductDetailScreen() {
 
         <View style={styles.content}>
           <Text style={styles.title}>{product.title}</Text>
+          <View style={styles.brandRow}>
+            <IconButton
+              icon="store-outline"
+              size={16}
+              style={styles.brandIcon}
+            />
+            <Text style={styles.brandChip}>{product.brand}</Text>
+          </View>
           <Text style={styles.description}>{product.description}</Text>
 
           <View style={styles.row}>
@@ -82,7 +118,7 @@ export default function ProductDetailScreen() {
               <Text style={styles.qtyBtn} onPress={decrement}>
                 -
               </Text>
-              <Text style={styles.qtyText}>{quantity}</Text>
+              <Text style={styles.qtyText}>{localQuantity}</Text>
               <Text style={styles.qtyBtn} onPress={increment}>
                 +
               </Text>
@@ -95,7 +131,34 @@ export default function ProductDetailScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
+        {inCartQuantity > 0 && (
+          <Text style={styles.inCartText}>
+            You already have {inCartQuantity} of this item in your cart
+          </Text>
+        )}
+        <Button
+          mode="contained"
+          onPress={handleAddToCart}
+          style={styles.addToCartBtn}
+        >
+          {inCartQuantity > 0
+            ? `Add ${localQuantity} more to Cart`
+            : `Add ${localQuantity} to Cart`}
+        </Button>
+      </View>
+
+      <Snackbar
+        visible={showSnackbar}
+        onDismiss={() => setShowSnackbar(false)}
+        duration={3000}
+        wrapperStyle={{ alignItems: "center" }}
+        style={{ marginBottom: insets.bottom + 80 }}
+      >
+        Added to cart
+      </Snackbar>
+    </SafeAreaView>
   );
 }
 
@@ -108,10 +171,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: colors.white,
   },
   container: {
     alignItems: "center",
-    paddingBottom: 120,
   },
   imageWrapper: {
     width: "100%",
@@ -181,5 +244,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
     marginTop: 4,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 24,
+    backgroundColor: colors.white,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+  },
+  inCartText: {
+    textAlign: "center",
+    color: colors.textSecondary,
+    marginVertical: 8,
+  },
+  addToCartBtn: {
+    borderRadius: 10,
+  },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: -4,
+    marginBottom: 12,
+  },
+  brandIcon: {
+    margin: 0,
+    marginRight: -4,
+  },
+  brandChip: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: colors.textSecondary,
+    backgroundColor: "#eee",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
 });

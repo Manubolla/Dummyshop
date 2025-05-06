@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     elevation: 0,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingVertical: 0,
+    padding: 0,
   },
   grid: {
     flexGrow: 1,

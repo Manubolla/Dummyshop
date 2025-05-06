@@ -70,7 +70,12 @@ export default function FilterModal({
               </TouchableRipple>
             </View>
 
-            <ScrollView contentContainerStyle={styles.content}>
+            <ScrollView
+              contentContainerStyle={[
+                styles.content,
+                { paddingBottom: insets.bottom + 100 },
+              ]}
+            >
               <Text style={styles.section}>Categories</Text>
               <CategorySelector
                 selected={selectedCategory}
@@ -114,7 +119,11 @@ export default function FilterModal({
               <View style={{ height: 24 }} />
             </ScrollView>
 
-            <Button mode="contained" style={styles.apply} onPress={handleApply}>
+            <Button
+              mode="contained"
+              style={[styles.apply, { marginBottom: insets.bottom + 16 }]}
+              onPress={handleApply}
+            >
               Apply Filters
             </Button>
           </View>
@@ -129,12 +138,11 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     backgroundColor: "#fff",
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
   },
   header: {
     flexDirection: "row",
-    padding: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -148,7 +156,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 16,
-    paddingBottom: 100,
   },
   section: {
     fontSize: 16,
@@ -163,7 +170,6 @@ const styles = StyleSheet.create({
   },
   apply: {
     marginHorizontal: 16,
-    marginBottom: 24,
     borderRadius: 10,
   },
   showMoreLess: { alignSelf: "flex-start", marginTop: 8 },

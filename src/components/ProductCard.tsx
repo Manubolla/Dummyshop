@@ -113,8 +113,13 @@ export default function ProductCard({
           )}
         </View>
       </View>
-
-      <Text style={styles.rating}>⭐ {product.rating.toFixed(1)}</Text>
+      <View style={styles.rating}>
+        <Text>⭐ {product.rating.toFixed(1)}</Text>
+        <View style={styles.brandRow}>
+          <IconButton icon="store-outline" size={14} style={styles.brandIcon} />
+          <Text style={styles.brandChip}>{product.brand}</Text>
+        </View>
+      </View>
     </Pressable>
   );
 }
@@ -137,6 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     paddingRight: 8,
+    marginTop: 40,
   },
   title: {
     fontSize: 16,
@@ -218,5 +224,27 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     color: colors.textPrimary,
     overflow: "hidden",
+  },
+  brandChip: {
+    alignSelf: "flex-start",
+    backgroundColor: "#eee",
+    color: colors.textSecondary,
+    paddingHorizontal: 10,
+    fontSize: 12,
+    fontWeight: "600",
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginBottom: 6,
+    marginTop: 8,
+  },
+  brandRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+  },
+  brandIcon: {
+    margin: 0,
+    marginLeft: -8,
+    marginRight: -2,
   },
 });

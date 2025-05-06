@@ -3,17 +3,20 @@ import { sendLocalNotification } from "@/src/hooks/useNotifications";
 import { useCartStore } from "@/src/store/useCartStore";
 import colors from "@/src/theme/colors";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
-import { Button, IconButton, Text } from "react-native-paper";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useState } from "react";
+import { FlatList, StyleSheet, View } from "react-native";
+import { Button, IconButton, Snackbar, Text } from "react-native-paper";
+import {
+  useSafeAreaInsets,
+  SafeAreaView,
+} from "react-native-safe-area-context";
 
 export default function CartScreen() {
   const { items, clearCart, addItem, removeItem } = useCartStore();
-
   const cartItems = Object.values(items);
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const [showSnackbar, setShowSnackbar] = useState(false);
 
   const total = cartItems.reduce(
     (acc, item) =>
@@ -22,27 +25,13 @@ export default function CartScreen() {
   );
 
   const handleRemove = (productId: number) => {
-    if (items[productId].quantity <= 1) {
-      Alert.alert(
-        "Remove item",
-        "Are you sure you want to remove this product from your cart?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Remove",
-            style: "destructive",
-            onPress: () => removeItem(productId),
-          },
-        ]
-      );
-    } else {
-      removeItem(productId);
-    }
+    if (items[productId].quantity <= 1) return;
+    removeItem(productId);
   };
 
   const handleBuy = () => {
-    Alert.alert("Success", "Thank you for your purchase!");
     clearCart();
+    setShowSnackbar(true);
     sendLocalNotification(
       "Your order is being prepared",
       "Thanks for shopping with us!",
@@ -51,8 +40,8 @@ export default function CartScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 12 }]}>
-      <View style={styles.header}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+      <View style={[styles.header, { marginTop: 12 }]}>
         <IconButton icon="arrow-left" onPress={router.back} />
         <Text style={styles.headerTitle}>Your Cart</Text>
         <View style={{ width: 48 }} />
@@ -76,10 +65,13 @@ export default function CartScreen() {
             <Text>Your cart is empty.</Text>
           </View>
         }
-        contentContainerStyle={styles.listContainer}
+        contentContainerStyle={{
+          paddingBottom: insets.bottom + 160,
+          flexGrow: 1,
+        }}
       />
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { bottom: insets.bottom + 12 }]}>
         <Text style={styles.total}>Total: ${total.toFixed(2)}</Text>
         <View style={styles.buttons}>
           <Button
@@ -101,7 +93,15 @@ export default function CartScreen() {
           </Button>
         </View>
       </View>
-    </View>
+
+      <Snackbar
+        visible={showSnackbar}
+        onDismiss={() => setShowSnackbar(false)}
+        duration={4000}
+      >
+        Thank you for your purchase!
+      </Snackbar>
+    </SafeAreaView>
   );
 }
 
@@ -124,7 +124,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: "absolute",
-    bottom: 40,
     left: 16,
     right: 16,
     backgroundColor: colors.surface,
@@ -150,6 +149,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     flex: 1,
   },
-  cartEmpty: { flex: 1, alignItems: "center", justifyContent: "center" },
-  listContainer: { paddingBottom: 120, flexGrow: 1 },
+  cartEmpty: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

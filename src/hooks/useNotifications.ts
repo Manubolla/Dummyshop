@@ -37,6 +37,7 @@ export function useNotifications() {
 }
 
 export async function sendLocalNotification(title: string, body: string, delaySeconds = 5) {
+  console.log(title, body, delaySeconds);
   const id = await Notifications.scheduleNotificationAsync({
     content: { title, body },
     trigger: {
