@@ -23,6 +23,10 @@ interface Props {
   categories: string[];
 }
 
+const MIN_PRICE = 0;
+const MAX_PRICE = 10000;
+const DEFAULT_PRICE_RANGE: [number, number] = [MIN_PRICE, MAX_PRICE];
+
 export default function FilterModal({
   visible,
   onDismiss,
@@ -33,7 +37,8 @@ export default function FilterModal({
   const [selectedCategory, setSelectedCategory] = useState<
     string | undefined
   >();
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [priceRange, setPriceRange] =
+    useState<[number, number]>(DEFAULT_PRICE_RANGE);
   const [showAllCategories, setShowAllCategories] = useState(false);
 
   const handleApply = () => {
@@ -43,7 +48,7 @@ export default function FilterModal({
 
   const handleReset = () => {
     setSelectedCategory(undefined);
-    setPriceRange([0, 10000]);
+    setPriceRange(DEFAULT_PRICE_RANGE);
   };
 
   if (!visible) return null;
@@ -55,7 +60,7 @@ export default function FilterModal({
   return (
     <Portal>
       <View style={StyleSheet.absoluteFill}>
-        <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}>
+        <View style={styles.container}>
           <View style={[styles.modalContainer, { paddingTop: insets.top }]}>
             <View style={styles.header}>
               <IconButton icon="arrow-left" onPress={onDismiss} />
@@ -77,9 +82,9 @@ export default function FilterModal({
                   onPress={() => {
                     setShowAllCategories(!showAllCategories);
                   }}
-                  style={{ alignSelf: "flex-start", marginTop: 8 }}
+                  style={styles.showMoreLess}
                 >
-                  <Text style={{ color: colors.primary, fontWeight: "500" }}>
+                  <Text style={styles.showMoreLessText}>
                     {showAllCategories ? "Show less" : "Show more"}
                   </Text>
                 </TouchableRipple>
@@ -91,9 +96,9 @@ export default function FilterModal({
                 <Text>${priceRange[1]}</Text>
               </View>
               <Slider
-                style={{ width: "100%" }}
-                minimumValue={0}
-                maximumValue={10000}
+                style={styles.slider}
+                minimumValue={MIN_PRICE}
+                maximumValue={MAX_PRICE}
                 step={1}
                 onValueChange={(v) => setPriceRange([0, v])}
                 value={priceRange[1]}
@@ -120,6 +125,7 @@ export default function FilterModal({
 }
 
 const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)" },
   modalContainer: {
     flex: 1,
     backgroundColor: "#fff",
@@ -160,4 +166,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderRadius: 10,
   },
+  showMoreLess: { alignSelf: "flex-start", marginTop: 8 },
+  showMoreLessText: { color: colors.primary, fontWeight: "500" },
+  slider: { width: "100%" },
 });
