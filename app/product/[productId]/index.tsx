@@ -153,7 +153,6 @@ export default function ProductDetailScreen() {
         visible={showSnackbar}
         onDismiss={() => setShowSnackbar(false)}
         duration={3000}
-        wrapperStyle={{ alignItems: "center" }}
         style={{ marginBottom: insets.bottom + 80 }}
       >
         Added to cart

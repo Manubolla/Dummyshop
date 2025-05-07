@@ -10,7 +10,8 @@
     "test": "jest --watchAll",
     "prebuild": "npx expo prebuild",
     "build:android:local": "npx eas build --profile development --platform android --local",
-    "test-android-deep-linking": "adb shell am start -a android.intent.action.VIEW -d 'dummyshop://product/1'"
+    "test-android-deep-linking": "adb shell am start -a android.intent.action.VIEW -d 'dummyshop://product/1'",
+    "test-ios-deep-linking": "xcrun simctl openurl booted 'dummyshop://product/1'"
   },
   "jest": {
     "preset": "jest-expo"
