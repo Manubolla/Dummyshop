@@ -33,6 +33,10 @@ Notifications.setNotificationHandler({
   }),
 });
 
+export const linking = {
+  prefixes: ["dummyshop://", "https://dummyshop.app"],
+};
+
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -65,7 +69,7 @@ function RootLayoutNav() {
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen
-              name="[productId]/index"
+              name="product/[productId]/index"
               options={{ title: "Product Detail" }}
             />
             <Stack.Screen name="cart" options={{ headerShown: false }} />

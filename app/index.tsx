@@ -137,7 +137,7 @@ export default function HomeScreen() {
   const renderItem = ({ item }: { item: ProductModel }) => {
     const onPressProductItem = () =>
       router.push({
-        pathname: "/[productId]",
+        pathname: "/product/[productId]",
         params: { productId: String(item.id) },
       });
 

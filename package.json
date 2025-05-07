@@ -1,5 +1,5 @@
 {
-  "name": "modak-technical-challenge",
+  "name": "dummyshop",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "test": "jest --watchAll",
     "prebuild": "npx expo prebuild",
-    "build:android:local": "npx eas build --profile development --platform android --local"
+    "build:android:local": "npx eas build --profile development --platform android --local",
+    "test-android-deep-linking": "adb shell am start -a android.intent.action.VIEW -d 'dummyshop://product/1'"
   },
   "jest": {
     "preset": "jest-expo"

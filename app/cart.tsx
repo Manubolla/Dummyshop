@@ -37,6 +37,9 @@ export default function CartScreen() {
       "Thanks for shopping with us!",
       5
     );
+    setTimeout(() => {
+      router.push("/");
+    }, 750);
   };
 
   return (

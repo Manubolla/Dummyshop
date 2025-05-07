@@ -82,7 +82,7 @@ npx eas build --profile development --platform android
 
 ```txt
 app/                  # Screens and routes (Expo Router)
-  ├── [productId]/    # Dynamic product detail screen
+  ├── product/[productId]/    # Dynamic product detail screen
   ├── _layout.tsx     # Shared layout for the stack
   ├── cart.tsx        # Cart screen
   ├── error.tsx       # Global error fallback screen
