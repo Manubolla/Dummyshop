@@ -67,6 +67,16 @@ export default function ProductCard({
       }}
     >
       <View style={styles.info}>
+        {product.brand && (
+          <View style={styles.brandRow}>
+            <IconButton
+              icon="store-outline"
+              size={14}
+              style={styles.brandIcon}
+            />
+            <Text style={styles.brandChip}>{product.brand}</Text>
+          </View>
+        )}
         <Text style={styles.title}>{product.title}</Text>
         <Text style={styles.description} numberOfLines={2}>
           {product.description}
@@ -113,13 +123,7 @@ export default function ProductCard({
           )}
         </View>
       </View>
-      <View style={styles.rating}>
-        <Text>⭐ {product.rating.toFixed(1)}</Text>
-        <View style={styles.brandRow}>
-          <IconButton icon="store-outline" size={14} style={styles.brandIcon} />
-          <Text style={styles.brandChip}>{product.brand}</Text>
-        </View>
-      </View>
+      <Text style={styles.rating}>⭐ {product.rating.toFixed(1)}</Text>
     </Pressable>
   );
 }
@@ -142,7 +146,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     paddingRight: 8,
-    marginTop: 40,
+    marginTop: 20,
   },
   title: {
     fontSize: 16,

@@ -3,7 +3,7 @@ import colors from "@/src/theme/colors";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useFonts } from "expo-font";
 import * as Notifications from "expo-notifications";
-import { Stack } from "expo-router";
+import { ErrorBoundaryProps, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
@@ -12,7 +12,11 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { PaperProvider } from "react-native-paper";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-export { ErrorBoundary } from "expo-router";
+import GlobalError from "./error";
+
+export const ErrorBoundary = (props: ErrorBoundaryProps) => (
+  <GlobalError {...props} />
+);
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
